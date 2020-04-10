@@ -4,19 +4,49 @@
 {% block customStyles %}
     <!-- Custom styles for this page -->
     <link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/upload-frame.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
+
+    <!----------------- Upload frame ------------------>
+    <div id="upload-frame" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group row">
+                    <div class="col-sm-6 mb-3 mb-sm-0">
+                        <input type="file" class="btn" id="upload" name="document" placeholder="Upload">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-6 mb-3 mb-sm-0">
+                        <button type="submit" class="btn btn-primary ml-3" id="upload">Send</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!----------------- ./Upload frame ----------------->
+
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">{{ path }}</h1>
     </div>
     {% if dir %}
+        <div class="container">
+            <button class="btn btn-primary p-8" id="upload-btn">Upload</button>
+            <button class="btn btn-secondary p-8" id="new-folder-btn">New folder</button>
+        </div>
         <div class="card-body container-fluid">
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>Nome</th>
+                            <th>
+                                Name
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -26,11 +56,25 @@
                         {% for file in dir %}
                             {% if file.is_dir %}
                                 <tr>
-                                    <td><a class="" href="?dir={{ path }}/{{ file.name }}">{{ file.name }}</a></td>
+                                    <td class="text-dark" style="display: flex; justify-content: space-between;">
+                                        <div>
+                                            <a class="" href="?dir={{ path }}/{{ file.name }}">{{ file.name }}</a>
+                                        </div>
+                                        <div>
+                                            <a class="text-danger" href="">Delete</a>
+                                        </div>
+                                    </td>
                                 </tr>
                             {% elif file.is_file %}
                                 <tr>
-                                    <td><a href="{% url 'download' %}?path=media/{{ path }}/{{ file.name }}">{{ file.name }}</a></td>
+                                    <td class="text-dark" style="display: flex; justify-content: space-between;">
+                                        <div>
+                                            <a href="{% url 'download' %}?path=media/{{ path }}/{{ file.name }}">{{ file.name }}</a>
+                                        </div>
+                                        <div>
+                                            <a class="text-danger" href="">Delete</a>
+                                        </div>
+                                    </td>
                                 </tr>
                             {% endif %}
                         {% endfor %}
@@ -51,4 +95,5 @@
     <script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
     <!-- Page level custom scripts -->
     <script src="{% static 'js/datatables-render.js' %}"></script>
+    <script src="{% static 'js/upload-frame.js' %}"></script>
 {% endblock %}
