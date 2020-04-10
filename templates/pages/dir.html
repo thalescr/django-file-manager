@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block customStyles %}
+    <!-- Custom styles for this page -->
+    <link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">{{ path }}</h1>
+    </div>
+    {% if dir %}
+        <div class="card-body container-fluid">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><a class="" href="?dir={{ path }}/..">..</a></td>
+                        </tr>
+                        {% for file in dir %}
+                            {% if file.is_dir %}
+                                <tr>
+                                    <td><a class="" href="?dir={{ path }}/{{ file.name }}">{{ file.name }}</a></td>
+                                </tr>
+                            {% elif file.is_file %}
+                                <tr>
+                                    <td><a href="{% url 'download' %}?path=media/{{ path }}/{{ file.name }}">{{ file.name }}</a></td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="card-body container-fluid">
+            <h2>Diretório não encontrado!</h2>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block customScripts %}
+    <!-- Page level plugins -->
+    <script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+    <!-- Page level custom scripts -->
+    <script src="{% static 'js/datatables-render.js' %}"></script>
+{% endblock %}
