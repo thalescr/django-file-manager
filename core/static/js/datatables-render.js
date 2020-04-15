@@ -4,7 +4,7 @@ $(document).ready(function() {
       searching: true,
       ordering: true,
       paging: true,
-      pageLength: 5,
+      pageLength: 10,
       language: {
         "sEmptyTable": "Nenhum registro encontrado",
         "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",

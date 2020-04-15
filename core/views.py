@@ -1,7 +1,8 @@
 from django.views.generic import TemplateView, View
 from django.shortcuts import redirect
+from django.http import FileResponse
+from wsgiref.util import FileWrapper
 from django.http import HttpResponse
-from django.core.files.storage import FileSystemStorage
 import os
 from project.settings import MEDIA_ROOT
 
@@ -53,7 +54,12 @@ class Download(View):
     def get(self, *args, **kwargs):
         path_to_file = self.request.GET.get('path')
         file_name = os.path.basename(path_to_file)
-        response = HttpResponse(content_type='application/force-download')
-        response['Content-Disposition'] = 'attachment; filename=' + file_name
-        response['X-Sendfile'] = path_to_file
+        wrapper = FileWrapper(open(path_to_file))
+        response = HttpResponse(wrapper, content_type='multipart/form-data')
+        response['Content-Length'] = os.path.getsize(path_to_file)
         return response
+
+class NewFolder(View):
+    def get(self, *args, **kwargs):
+        path_to_file = self.request.GET.get('path')
+        pass

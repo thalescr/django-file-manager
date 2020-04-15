@@ -4,40 +4,83 @@
 {% block customStyles %}
     <!-- Custom styles for this page -->
     <link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
-    <link href="{% static 'css/upload-frame.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
 
     <!----------------- Upload frame ------------------>
-    <div id="upload-frame" class="modal">
-        <!-- Modal content -->
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <form method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="form-group row">
-                    <div class="col-sm-6 mb-3 mb-sm-0">
-                        <input type="file" class="btn" id="upload" name="document" placeholder="Upload">
-                    </div>
+    <div id="upload-modal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Upload de arquivo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <div class="form-group row">
-                    <div class="col-sm-6 mb-3 mb-sm-0">
-                        <button type="submit" class="btn btn-primary ml-3" id="upload">Send</button>
-                    </div>
+                <div class="modal-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group row">
+                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                <input type="file" class="btn" id="upload" name="document" placeholder="Upload">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                <button type="submit" class="btn btn-primary ml-3" id="upload">Send</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
     <!----------------- ./Upload frame ----------------->
+
+    <!--------------- New folder frame ----------------->
+    <div id="new-folder-modal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create new folder</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" name="folder-name" id="folder-name" placeholder="Folder name">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Create</button>
+                </div>
+
+    <!-- Search -->
+    <form class="d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" action="">
+        <div class="input-group">
+            <input type="text" class="form-control bg-light border-0 small" placeholder="Buscando por..." aria-label="Search" aria-describedby="basic-addon2" name="query">
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="submit">
+                    <i class="fas fa-search fa-sm"  ></i>
+                </button>
+            </div>
+        </div>
+    </form>
+    <!-- ./Search -->
+            </div>
+        </div>
+    </div>
+    <!-------------- ./New folder frame ---------------->
 
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">{{ path }}</h1>
     </div>
     {% if dir %}
         <div class="container">
-            <button class="btn btn-primary p-8" id="upload-btn">Upload</button>
-            <button class="btn btn-secondary p-8" id="new-folder-btn">New folder</button>
+            <a class="btn btn-primary p-8" href="?dir={{ path }}/..">Previous folder</a>
+            <button class="btn btn-secondary p-8" data-toggle="modal" data-target="#upload-modal">Upload new file</button>
+            <button class="btn btn-secondary p-8" data-toggle="modal" data-target="#new-folder-modal">Create new folder</button>
         </div>
         <div class="card-body container-fluid">
             <div class="table-responsive">
@@ -50,9 +93,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td><a class="" href="?dir={{ path }}/..">..</a></td>
-                        </tr>
                         {% for file in dir %}
                             {% if file.is_dir %}
                                 <tr>
@@ -69,7 +109,7 @@
                                 <tr>
                                     <td class="text-dark" style="display: flex; justify-content: space-between;">
                                         <div>
-                                            <a href="{% url 'download' %}?path=media/{{ path }}/{{ file.name }}">{{ file.name }}</a>
+                                            <a download href="{% url 'download' %}?path=media/{{ path }}/{{ file.name }}">{{ file.name }}</a>
                                         </div>
                                         <div>
                                             <a class="text-danger" href="">Delete</a>
@@ -95,5 +135,4 @@
     <script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
     <!-- Page level custom scripts -->
     <script src="{% static 'js/datatables-render.js' %}"></script>
-    <script src="{% static 'js/upload-frame.js' %}"></script>
 {% endblock %}
