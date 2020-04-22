@@ -11,36 +11,39 @@ class Directory(TemplateView):
     template_name = 'pages/dir.html'
 
     # Get requested directory
-    def get_directory(self, *args, **kwargs):
+    def get_real_path(self, *args, **kwargs):
         if self.request.GET.get('dir'):
             # Combine requested path with MEDIA_ROOT
             dir = os.path.join(MEDIA_ROOT, self.request.GET.get('dir'))
             # Normalize path (remove '../' and './')
             dir = os.path.normpath(dir)
-            # Check if requested path is within MEDIA_ROOT
+            # Check if requested path is inside MEDIA_ROOT
             if os.path.commonprefix([dir, MEDIA_ROOT]) == MEDIA_ROOT:
                 if os.path.exists(dir):
                     return dir
-        return None
+        return MEDIA_ROOT
+
+    def get_relative_path(self, *args, **kwargs):
+        return os.path.relpath(self.get_real_path(), MEDIA_ROOT)
 
     # Send directory info and requested path to template
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['dir'] = os.scandir(self.get_directory())
-        context['path'] = self.request.GET.get('dir')
+        context['dir'] = os.scandir(self.get_real_path())
+        context['path'] = self.get_relative_path()
         return context
-
-    # Render directory only if get_directory() returns anything but None
+    '''
+    # Render directory only if get_real_path() returns anything but None
     def render_to_response(self, context, **kwargs):
-        if self.get_directory():
+        if self.get_real_path() is not MEDIA_ROOT:
             return super().render_to_response(context, **kwargs)
         # Otherwise redirect to MEDIA_ROOT directory
         else:
-            return redirect('/?dir=.')
-
+            return redirect('home')
+    '''
     # Save uploaded file into current folder
     def post(self, *args, **kwargs):
-        dir = self.get_directory()
+        dir = self.get_real_path()
         uploaded_file = self.request.FILES['document']
         if dir:
             fs = FileSystemStorage(location=dir)
