@@ -1,8 +1,7 @@
 from django.views.generic import TemplateView, View
 from django.shortcuts import redirect
-from django.http import FileResponse
-from wsgiref.util import FileWrapper
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 import os
 from project.settings import MEDIA_ROOT
 
@@ -51,16 +50,17 @@ class Directory(TemplateView):
         return self.render_to_response(self.get_context_data())
         
 
-
 # Download view
-class Download(View):
-    def get(self, *args, **kwargs):
-        path_to_file = self.request.GET.get('path')
-        file_name = os.path.basename(path_to_file)
-        wrapper = FileWrapper(open(path_to_file))
-        response = HttpResponse(wrapper, content_type='multipart/form-data')
-        response['Content-Length'] = os.path.getsize(path_to_file)
-        return response
+@login_required
+def serve_view(request, file):
+    document = os.path.join(MEDIA_ROOT, file)
+    # Split the elements of the path
+    path, file_name = os.path.split(file)
+    response = HttpResponse(document)
+    response["Content-Disposition"] = "attachment; filename=" + file_name
+    # nginx uses this path to serve the file
+    response["X-Accel-Redirect"] = document
+    return response
 
 class NewFolder(View):
     def get(self, *args, **kwargs):
