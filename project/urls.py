@@ -15,17 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.contrib.auth.decorators import login_required
-from django.views.static import serve
 from django.conf import settings
-
-@login_required
-def protected_serve(request, path, document_root=None, show_indexes=False):
-    return serve(request, path, document_root, show_indexes)
+from core.views import protected_serve
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
-    #path(settings.MEDIA_URL[1:] + '<path>', protected_serve, {'document_root': settings.MEDIA_ROOT}, name='media')
+    path(settings.MEDIA_URL[1:] + '<path:path>', protected_serve, {'document_root': settings.MEDIA_ROOT}, name='media'),
 ] 
 

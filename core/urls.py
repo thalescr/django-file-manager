@@ -4,14 +4,10 @@ from django.contrib.auth.decorators import login_required
 
 from .views import (
     Directory,
-    serve_view,
-    NewFolder,
 )
 
 urlpatterns = [
-    path('', login_required(Directory.as_view()), name='home'),
-    path('download/<path:file>', serve_view, name='download'),
-    path('new-folder/', login_required(NewFolder.as_view()), name='new_folder'),
+    path('', Directory.as_view(), name='home'),
     path('login/', LoginView.as_view(), name='login'),
-    path('logout/', login_required(LogoutView.as_view()), name='logout'),
+    path('logout/', LogoutView.as_view(), name='logout'),
 ]

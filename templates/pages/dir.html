@@ -48,30 +48,44 @@
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <input type="text" name="folder-name" id="folder-name" placeholder="Folder name">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Create</button>
-                </div>
-
-    <!-- Search -->
-    <form class="d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" action="">
-        <div class="input-group">
-            <input type="text" class="form-control bg-light border-0 small" placeholder="Buscando por..." aria-label="Search" aria-describedby="basic-addon2" name="query">
-            <div class="input-group-append">
-                <button class="btn btn-primary" type="submit">
-                    <i class="fas fa-search fa-sm"  ></i>
-                </button>
-            </div>
-        </div>
-    </form>
-    <!-- ./Search -->
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        {{ new_folder_form.folder_name }}
+                        <!--<input type="text" name="folder-name" id="folder-name" placeholder="Folder name">-->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
     <!-------------- ./New folder frame ---------------->
+
+    <!------------------ Delete frame ------------------>
+    <div id="delete-modal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div id="filename" class="modal-header">
+                </div>
+                <form id="delete-form" method="post" action="">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <p>Are you sure? This is irreversible!</p>
+                        {{ delete_form.delete }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!----------------- ./Delete frame ----------------->
 
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">{{ path }}</h1>
@@ -93,30 +107,27 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for file in dir %}
-                            {% if file.is_dir %}
-                                <tr>
-                                    <td class="text-dark" style="display: flex; justify-content: space-between;">
-                                        <div>
+                        {% for file in dir %}    
+                            <tr>
+                                <td class="text-dark" style="display: flex; justify-content: space-between;">
+                                    <div>
+                                        {% if file.is_dir %}
                                             <a class="" href="?dir={{ path }}/{{ file.name }}">{{ file.name }}</a>
-                                        </div>
-                                        <div>
-                                            <a class="text-danger" href="">Delete</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% elif file.is_file %}
-                                <tr>
-                                    <td class="text-dark" style="display: flex; justify-content: space-between;">
-                                        <div>
-                                            <a href="{% url 'download' path|add:'/'|add:file.name %}">{{ file.name }}</a>
-                                        </div>
-                                        <div>
-                                            <a class="text-danger" href="">Delete</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% endif %}
+                                        {% elif file.is_file %}
+                                            <a href="{% url 'media' path|add:'/'|add:file.name %}">{{ file.name }}</a>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                    <a href="" class="text-danger" data-toggle="modal" data-target="#delete-modal" onclick="setFileName{{ forloop.counter }}()">Delete</a>
+                                    </div>
+                                    <script>
+                                        function setFileName{{ forloop.counter }}() {
+                                            document.getElementById("filename").innerHTML = "Delete {{ file.name }}?"
+                                            document.getElementById("delete-form").setAttribute("action", "?file={{ file.name }}")
+                                        }
+                                    </script>
+                                </td>
+                            </tr>
                         {% endfor %}
                     </tbody>
                 </table>
